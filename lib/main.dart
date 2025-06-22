@@ -1,4 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:listview/core/theme/app_colors.dart';
+import 'package:listview/features/home/presentation/controllers/get_most_rated_cubit/most_rated_cubit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,7 +34,10 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: BlocProvider(
+        create: (context) => MostRatedCubit(),
+        child: MyHomePage(title: 'Movie App'),
+      ),
     );
   }
 }
@@ -44,85 +51,87 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-List names = [
-  "Alice Johnson",
-  "Bob Smith",
-  "Charlie Brown",
-  "Diana Prince",
-  "Ethan Hunt",
-  "Fiona Gallagher",
-  "George Martin",
-  "Hannah Williams",
-  "Ian Wright",
-  "Jessica Jones",
-  "Kevin Lee",
-  "Laura Palmer",
-  "Michael Scott",
-  "Nina Dobrev",
-  "Oscar Isaac",
-  "Paula Abdul",
-  "Quincy Adams",
-  "Rachel Green",
-  "Steve Rogers",
-  "Tina Turner"
-];
-List numbers = [
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-  10,
-  11,
-  12,
-  13,
-  14,
-  15,
-  16,
-  17,
-  18,
-  19,
-  20
+List<String> imageUrls = [
+  "https://i.pravatar.cc/150?img=1",
+  "https://i.pravatar.cc/150?img=2",
+  "https://i.pravatar.cc/150?img=3",
+  "https://i.pravatar.cc/150?img=4",
+  "https://i.pravatar.cc/150?img=5",
+  "https://i.pravatar.cc/150?img=6",
+  "https://i.pravatar.cc/150?img=7",
+  "https://i.pravatar.cc/150?img=8",
+  "https://i.pravatar.cc/150?img=9",
+  "https://i.pravatar.cc/150?img=10",
+  "https://i.pravatar.cc/150?img=11",
+  "https://i.pravatar.cc/150?img=12",
+  "https://i.pravatar.cc/150?img=13",
+  "https://i.pravatar.cc/150?img=14",
+  "https://i.pravatar.cc/150?img=15",
+  "https://i.pravatar.cc/150?img=16",
+  "https://i.pravatar.cc/150?img=17",
+  "https://i.pravatar.cc/150?img=18",
+  "https://i.pravatar.cc/150?img=19",
+  "https://i.pravatar.cc/150?img=20",
 ];
 
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery
+        .of(context)
+        .size;
     return Scaffold(
+        backgroundColor: AppColors.navy,
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          backgroundColor: AppColors.navy,
           title: Text(widget.title),
         ),
-        body: ListView.builder(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          itemCount: names.length,
-          itemBuilder: (context, index) {
-            return Row(
-              children: [
-                Text(
-                  names[index],
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                Text(
-                  numbers[index].toString(),
+        body: Column(
+          children: [
+            SizedBox(
+              height: size.height * 0.30,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                itemCount: imageUrls.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 17.0),
+                    child: SizedBox(
+                      height: size.height * 0.28,
+                      width: size.width * 0.45,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(19),
+                        child: CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          imageUrl: imageUrls[index],
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            ElevatedButton(
+                onPressed: ()async {
+                  var data =await  context.read<MostRatedCubit>().getTopRated();
+                  print(data.results.length);
+
+                },
+                child: Text(
+                  'call',
                   style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.blue),
-                )
-              ],
-            );
-          },
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                  ),
+                ))
+          ],
         ));
   }
-  //
 //
-
+//
 }
